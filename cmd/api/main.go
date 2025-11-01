@@ -5,7 +5,7 @@ import (
     "log"
     "net/http"
     
-    "github.com/denerkrebs/WorkflowEngine/internal/infrastructure/router"
+    "github.com/denerkrebs/WorkflowEngine/internal/infrastructure/http/router"
 )
 
 func main() {
