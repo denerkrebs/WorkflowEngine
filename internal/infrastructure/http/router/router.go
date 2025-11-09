@@ -6,21 +6,20 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/denerkrebs/WorkflowEngine/internal/infrastructure/container"
 	"github.com/denerkrebs/WorkflowEngine/internal/infrastructure/http/handler"
 )
 
-func NewRouter() *chi.Mux {
+func NewRouter(c *container.Container) *chi.Mux {
 	r := chi.NewRouter()
 
-	// Middlewares
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RequestID)
 
-	// Rotas
 	r.Get("/health", healthHandler)
 
-	r.Mount("/users", userRoutes())
+	r.Mount("/users", userRoutes(c))
 
 	return r
 }
@@ -30,10 +29,10 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
-func userRoutes() chi.Router {
+func userRoutes(c *container.Container) chi.Router {
 	r := chi.NewRouter()
 
-    userHandler := handler.NewUserHandler();
+	userHandler := handler.NewUserHandler(*c.RegisterUserUseCase)
 
 	r.Post("/", userHandler.NewUser)
 

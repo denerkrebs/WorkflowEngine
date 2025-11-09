@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/denerkrebs/WorkflowEngine/config"
-	"github.com/denerkrebs/WorkflowEngine/internal/infrastructure/database"
+	"github.com/denerkrebs/WorkflowEngine/internal/infrastructure/container"
 	"github.com/denerkrebs/WorkflowEngine/internal/infrastructure/http/router"
 )
 
@@ -16,12 +16,12 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	_, err = database.NewPostgresConnection(cfg.Database)
+	c, err := container.New(cfg)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("Failed to initialize container: %v", err)
 	}
 
-	r := router.NewRouter()
+	r := router.NewRouter(c)
 
 	port := cfg.GetServerPort()
 

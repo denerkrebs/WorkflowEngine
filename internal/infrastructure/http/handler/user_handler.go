@@ -5,28 +5,24 @@ import (
 	"net/http"
 
 	"github.com/denerkrebs/WorkflowEngine/internal/application/dto"
-	"github.com/denerkrebs/WorkflowEngine/internal/domain/entity"
+	"github.com/denerkrebs/WorkflowEngine/internal/application/usecase"
 )
 
-// definir a dependencia
 type UserHandler struct {
+	registerUserUseCase *usecase.RegisterUserUseCase
 }
 
-// injetar a dependencia
-func NewUserHandler() *UserHandler {
-	return &UserHandler{}
+func NewUserHandler(registerUserUseCase usecase.RegisterUserUseCase) *UserHandler {
+	return &UserHandler{
+		registerUserUseCase: &registerUserUseCase,
+	}
 }
 
 func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) {
 	var userDto dto.UserDto
 	json.NewDecoder(r.Body).Decode(&userDto)
 
-	user, err := entity.NewUser(entity.NewUserParams{
-		Name:     userDto.Name,
-		Email:    userDto.Email,
-		Login:    userDto.Login,
-		Password: userDto.Password,
-	})
+	err := h.registerUserUseCase.Execute(r.Context(), userDto)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -35,5 +31,4 @@ func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
 }

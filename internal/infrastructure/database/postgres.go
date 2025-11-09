@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/denerkrebs/WorkflowEngine/config"
+	"github.com/denerkrebs/WorkflowEngine/internal/infrastructure/persistence/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -40,4 +41,10 @@ func NewPostgresConnection(cfg config.DatabaseConfig) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	return db, nil
+}
+
+func AutoMigrate(db *gorm.DB) error {
+	return db.AutoMigrate(
+		&model.User{},
+	)
 }
